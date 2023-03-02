@@ -1,29 +1,34 @@
 <template>
-    <div class="max-w-5xl mx-auto p-20">
-        <h1 class="text-4xl mb-20">Weather App</h1>
+    <div class="h-screen mx-auto flex justify-center items-center bg-gradient-to-tr from-sky-200 to-sky-400">
+        <div class="px-12 py-20 max-w-2xl w-full flex flex-col items-center">
+            <h1 class="text-4xl pb-12 text-center text-sky-900 leading-relaxed font-bold">Weather App</h1>
 
-        <input type="text" v-model="search" placeholder="Choose city..." @change="getWeather" class="px-4 py-2 border rounded-lg shadow-lg focus:outline-none ">
+            <input type="text" v-model="search" placeholder="Choose city..." @change="getWeather" class="placeholder-sky-500 max-w-md mx-auto w-full px-4 py-2 border border-sky-300 opacity-70 rounded-lg shadow-sky-300 shadow-md text-sky-700 font-semibold focus:outline-none ">
 
-        <!-- result card -->
-        <div v-if="result" class="mt-20 flex flex-col gap-2 p-8 w-fit bg-gray-50 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-semibold border-b-2 border-gray-500 mb-2">{{  result.name }}</h2>
-            <p>{{ result.description }}</p>
-            <p>Temperature: {{ result.temp }} st C</p>
-            <p>Feels like: {{ result.feels_like }} st C</p>
-            <p>T min: {{ result.temp_min }} st C</p>
-            <p>T max: {{ result.temp_max }} st C</p>
-            <p>Humidity: {{ result.humidity }} %</p>
-        </div>
-        <div v-if="err" class="text-red-500 mt-3 pl-4">{{ err }}</div>
-
-        <!-- history -->
-        <div v-if="historyResults.length > 0">
-            <h3 class="mb-4 mt-6 font-semibold text-xl">Recent Searches</h3>
-            <div class="flex gap-4 items-center">
-                <div  v-for="city in historyResults" :key="city" c>
-                    <h3 class="font-semibold border rounded-lg px-4 py-2 shadow-md" @click="getCityWeather(city)">{{ city }}</h3>
+            <!-- result card -->
+            <div v-if="result" class="mt-20 flex flex-col gap-2 px-16 py-12 w-fit bg-white/50  rounded-lg shadow-lg shadow-sky-300 text-sky-600">
+                <h2 class="text-3xl font-semibold border-b-2 border-sky-800 mb-2 text-sky-800">{{ result.name }}</h2>
+                <p class="text-xl text-sky-800  ">{{ result.description }}</p>
+                <p class="text-3xl font-bold text-sky-800 my-3"> {{ result.temp }} °C </p>
+                <p>Feels like: {{ result.feels_like }} st C</p>
+                <div class="flex gap-5 items-center">
+                    <p>T min: {{ result.temp_min }} °C</p>
+                    <p>T max: {{ result.temp_max }} °C</p>
+                    <p>Humidity: {{ result.humidity }} %</p>
                 </div>
             </div>
+            <div v-if="err" class="text-red-500 mt-3 pl-4">{{ err }}</div>
+
+            <!-- history -->
+            <div v-if="historyResults.length > 0">
+                <h3 class="mb-6 mt-12 font-semibold text-2xl text-sky-800">Recent Searches</h3>
+                <div class="flex gap-4 items-center">
+                    <div  v-for="city in historyResults" :key="city" c>
+                        <h3 class="font-semibold text-sky-800 border border-sky-300 rounded-lg px-4 py-2 shadow-md shadow-sky-300 bg-white/50" @click="getCityWeather(city)">{{ city }}</h3>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
