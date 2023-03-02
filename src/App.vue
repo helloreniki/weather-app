@@ -5,7 +5,7 @@
         <input type="text" v-model="search" placeholder="Choose city..." @change="getWeather" class="px-4 py-2 border rounded-lg shadow-lg focus:outline-none ">
 
         <!-- result card -->
-        <div v-if="result" class="my-20 flex flex-col gap-2 p-8 w-fit bg-gray-50 rounded-lg shadow-lg">
+        <div v-if="result" class="mt-20 flex flex-col gap-2 p-8 w-fit bg-gray-50 rounded-lg shadow-lg">
             <h2 class="text-2xl font-semibold border-b-2 border-gray-500 mb-2">{{  result.name }}</h2>
             <p>{{ result.description }}</p>
             <p>Temperature: {{ result.temp }} st C</p>
@@ -18,9 +18,11 @@
 
         <!-- history -->
         <div v-if="historyResults.length > 0">
-            <h3 class="mb-4 font-semibold text-xl">Recent Searches</h3>
-            <div  v-for="city in historyResults" :key="city" class="flex gap-4 items-center">
-                <h3 class="font-semibold border rounded-lg px-4 py-2 shadow-md" @click="getCityWeather(city)">{{ city }}</h3>
+            <h3 class="mb-4 mt-6 font-semibold text-xl">Recent Searches</h3>
+            <div class="flex gap-4 items-center">
+                <div  v-for="city in historyResults" :key="city" c>
+                    <h3 class="font-semibold border rounded-lg px-4 py-2 shadow-md" @click="getCityWeather(city)">{{ city }}</h3>
+                </div>
             </div>
         </div>
 
@@ -42,7 +44,6 @@ async function getWeather(){
     try {
         await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${search.value}&units=metric&appid=${apiKey}`)
                     .then(response => {
-                        console.log(response)
                         if(response.ok){
                            return response.json()
                         } else {
@@ -59,10 +60,17 @@ async function getWeather(){
                         result.value['name'] = name
                         result.value['description'] = weather[0].description
                         result.value['description_short'] = weather[0].main
-                    //    console.log('result name', result.value.name)
-                    //    console.log(historyResults)
 
-                        historyResults.value.unshift(result.value.name)
+                        if(!historyResults.value.includes(result.value.name)){
+                            historyResults.value.unshift(result.value.name)
+                        } else {
+                            // remove duplicate (filter out duplicate)
+                            historyResults.value = historyResults.value.filter(el => el !== result.value.name )
+                            // then push value at the beginning of array
+                            historyResults.value.unshift(result.value.name)
+
+                        }
+
                         if(historyResults.value.length > 5){
                             // only get first 5
                             historyResults.value = historyResults.value.slice(0, 5)
@@ -70,16 +78,11 @@ async function getWeather(){
                     })
 
 
-        console.log('history', historyResults.value)
-
-
     } catch (error) {
         err.value = error.message
     }
 
 }
-
-console.log(historyResults)
 
 function getCityWeather(city) {
     search.value = city
