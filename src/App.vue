@@ -5,14 +5,14 @@
         <input type="text" v-model="search" placeholder="Choose city..." @change="getWeather" class="px-4 py-2 border rounded-lg shadow-lg focus:outline-none ">
 
         <!-- result card -->
-        <div v-if="weather" class="my-20 flex flex-col gap-2 p-8 w-fit bg-gray-50 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-semibold border-b-2 border-gray-500 mb-2">{{  weather.city }}</h2>
-            <p>{{ weather.description?.description }}</p>
-            <p>Temperature: {{ weather.main.temp }} st C</p>
-            <p>Feels like: {{ weather.main.feels_like }} st C</p>
-            <p>T min: {{ weather.main.temp_min }} st C</p>
-            <p>T max: {{ weather.main.temp_max }} st C</p>
-            <p>Huimdity: {{ weather.main.humidity }} st C</p>
+        <div v-if="result" class="my-20 flex flex-col gap-2 p-8 w-fit bg-gray-50 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold border-b-2 border-gray-500 mb-2">{{  result.name }}</h2>
+            <p>{{ result.description }}</p>
+            <p>Temperature: {{ result.temp }} st C</p>
+            <p>Feels like: {{ result.feels_like }} st C</p>
+            <p>T min: {{ result.temp_min }} st C</p>
+            <p>T max: {{ result.temp_max }} st C</p>
+            <p>Humidity: {{ result.humidity }} %</p>
         </div>
         <div v-if="err" class="text-red-500 mt-3 pl-4">{{ err }}</div>
 
@@ -22,7 +22,7 @@
 <script setup>
 import { ref } from 'vue'
 
-const weather = ref(null)
+const result = ref(null)
 const search = ref('')
 const err = ref(null)
 
@@ -40,19 +40,19 @@ async function getWeather(){
                             throw new Error(response.statusText)
                         }
                     })
-                    // .then(data => weather.value = data.main)
-                    .then(data => {
-                       console.log(data)
+                    // .then(data => result.value = data.main)
+                    .then(({ name, main, weather }) => {
+                    //    console.log('name', name)
+                    //    console.log('main', main)
+                    //    console.log('weather', weather)
                        err.value = null
-                       if(data) {
-                           weather.value = []
-                           weather.value['city'] = data.name
-                           weather.value['main'] = data.main
-                           weather.value['description'] = data.weather[0]
-                       }
+                       result.value = main
+                       result.value['name'] = name
+                       result.value['description'] = weather[0].description
+                       result.value['description_short'] = weather[0].main
                     })
 
-        console.log('weather', weather.value)
+        console.log('result', result.value)
 
 
     } catch (error) {
