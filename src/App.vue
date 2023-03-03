@@ -10,7 +10,7 @@
                 <h2 class="text-3xl font-semibold border-b-2 border-sky-800 mb-2 text-sky-800">{{ result.name }}</h2>
                 <p class="text-xl text-sky-800  ">{{ result.description }}</p>
                 <p class="text-3xl font-bold text-sky-800 my-3"> {{ result.temp }} °C </p>
-                <p>Feels like: {{ result.feels_like }} st C</p>
+                <p>Feels like: {{ result.feels_like }} °C</p>
                 <div class="flex gap-5 items-center">
                     <p>T min: {{ result.temp_min }} °C</p>
                     <p>T max: {{ result.temp_max }} °C</p>
@@ -19,7 +19,7 @@
             </div>
             <div v-if="err" class="text-red-500 mt-3 pl-4">{{ err }}</div>
 
-            <!-- history -->
+            <!-- history results view -->
             <div v-if="historyResults.length > 0">
                 <h3 class="mb-6 mt-12 font-semibold text-2xl text-sky-800">Recent Searches</h3>
                 <div class="flex gap-4 items-center">
@@ -30,74 +30,59 @@
             </div>
 
         </div>
-
     </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 const result = ref(null)
 const search = ref('')
 const err = ref(null)
 const historyResults = ref([])
 
-// https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
 const apiKey = import.meta.env.VITE_API_KEY
 
 async function getWeather(){
     try {
         await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${search.value}&units=metric&appid=${apiKey}`)
-                    .then(response => {
-                        if(response.ok){
-                           return response.json()
-                        } else {
-                            throw new Error(response.statusText)
-                        }
-                    })
-                    // .then(data => result.value = data.main)
-                    .then(({ name, main, weather }) => {
-                    //    console.log('name', name)
-                    //    console.log('main', main)
-                    //    console.log('weather', weather)
-                        err.value = null
-                        result.value = main
-                        result.value['name'] = name
-                        result.value['description'] = weather[0].description
-                        result.value['description_short'] = weather[0].main
+            .then(response => {
+                if(response.ok){
+                    return response.json()
+                } else {
+                    throw new Error(response.statusText)
+                }
+            })
+            .then(({ name, main, weather }) => {
+                err.value = null
+                result.value = main
+                result.value['name'] = name
+                result.value['description'] = weather[0].description
+                result.value['description_short'] = weather[0].main
 
-                        if(!historyResults.value.includes(result.value.name)){
-                            historyResults.value.unshift(result.value.name)
-                        } else {
-                            // remove duplicate (filter out duplicate)
-                            historyResults.value = historyResults.value.filter(el => el !== result.value.name )
-                            // then push value at the beginning of array
-                            historyResults.value.unshift(result.value.name)
+                if(!historyResults.value.includes(result.value.name)){
+                    historyResults.value.unshift(result.value.name)
+                } else {
+                    // remove duplicate value (filter out duplicate)
+                    historyResults.value = historyResults.value.filter(el => el !== result.value.name )
 
-                        }
+                    // then push value at the beginning of array
+                    historyResults.value.unshift(result.value.name)
+                }
 
-                        if(historyResults.value.length > 5){
-                            // only get first 5
-                            historyResults.value = historyResults.value.slice(0, 5)
-                        }
-                    })
-
-
+                if(historyResults.value.length > 5){
+                    // only get first 5
+                    historyResults.value = historyResults.value.slice(0, 5)
+                }
+            })
     } catch (error) {
         err.value = error.message
     }
-
 }
 
 function getCityWeather(city) {
     search.value = city
     getWeather()
 }
-
-// add debounce, dont want for every key stroke
-// watch(search, () => {
-//     getWeather()
-// } )
-
 
 </script>
